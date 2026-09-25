@@ -17,7 +17,6 @@ def add_common_args(
     parser: argparse.ArgumentParser,
     *,
     require_tickers: bool = False,
-    include_analyst_flags: bool = True,
     include_ollama: bool = True,
 ) -> argparse.ArgumentParser:
     parser.add_argument(
@@ -28,18 +27,17 @@ def add_common_args(
         required=require_tickers,
         help="Comma-separated list of stock ticker symbols (e.g., AAPL,MSFT,GOOGL)",
     )
-    if include_analyst_flags:
-        parser.add_argument(
-            "--analysts",
-            type=str,
-            required=False,
-            help="Comma-separated list of analysts to use (e.g., michael_burry,other_analyst)",
-        )
-        parser.add_argument(
-            "--analysts-all",
-            action="store_true",
-            help="Use all available analysts (overrides --analysts)",
-        )
+    parser.add_argument(
+        "--analysts",
+        type=str,
+        required=False,
+        help="Comma-separated list of analysts to use (e.g., michael_burry,other_analyst)",
+    )
+    parser.add_argument(
+        "--analysts-all",
+        action="store_true",
+        help="Use all available analysts (overrides --analysts)",
+    )
     if include_ollama:
         parser.add_argument("--ollama", action="store_true", help="Use Ollama for local LLM inference")
     parser.add_argument("--model", type=str, required=False, help="Model name to use (e.g., gpt-4o)")
@@ -237,7 +235,7 @@ def parse_cli_inputs(
     parser = argparse.ArgumentParser(description=description)
 
     # Common/interactive flags
-    add_common_args(parser, require_tickers=require_tickers, include_analyst_flags=True, include_ollama=True)
+    add_common_args(parser, require_tickers=require_tickers, include_ollama=True)
     add_date_args(parser, default_months_back=default_months_back)
 
     # Funding flags (standardized, with alias)
