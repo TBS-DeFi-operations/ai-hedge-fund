@@ -46,3 +46,18 @@ def test_backtesting_cli_accepts_documented_ticker_alias() -> None:
 
     assert ticker_calls
     assert _keyword_value(ticker_calls[0], "dest") == "tickers"
+
+
+def test_shared_cli_always_accepts_analyst_flags() -> None:
+    tree = ast.parse((ROOT / "src/cli/input.py").read_text())
+    common_args = next(
+        node for node in tree.body if isinstance(node, ast.FunctionDef) and node.name == "add_common_args"
+    )
+    direct_flags = {
+        flag
+        for statement in common_args.body
+        if isinstance(statement, ast.Expr) and isinstance(statement.value, ast.Call)
+        for flag in _string_args(statement.value)
+    }
+
+    assert {"--analysts", "--analysts-all"}.issubset(direct_flags)
